@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="zh-hant">
+<head>
+    <meta charset="UTF-8">
+    <title>Dashboard</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.js"
+            integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk=" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css"
+          integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js"
+            integrity="sha384-wHAiFfRlMFy6i5SRaxvfOCifBUQy1xHdJ/yoi7FRNXMRBu5WHdZYu1hA6ZOblgut"
+            crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js"
+            integrity="sha384-B0UglyR+jN6CkvvICOB2joaf5I4l3gm9GU6Hc1og6Ls7i6U/mkkaduKaBhlAXv9k"
+            crossorigin="anonymous"></script>
+    <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+</head>
+<style>
+    td, th {
+        text-align: center;
+    }
+</style>
+<body>
+{#NAV--START#}
+<nav class="navbar navbar-light" style="background-color: #e3f2fd;">
+    <ul class="nav">
+        <li class="nav-item">
+            <a class="nav-link active" href="{% url 'Index' %}">清單表</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="{% url 'all' %}">大表</a>
+        </li>
+    </ul>
+</nav>
+{#NAV--END#}
+<center style="margin-top: 20px">
+    <table class="col-6 table table-striped">
+        <thead>
+        <tr>
+            <th scope="col">#</th>
+            <th scope="col">名稱</th>
+            <th scope="col">開啟</th>
+            <th scope="col">驗證</th>
+        </tr>
+        </thead>
+        <tbody id="content">
+        {% for items in db %}
+            <tr>
+                <th scope="row">{{ items.pk }}</th>
+                <td>
+                    {{ items.name }}
+                </td>
+                <td>
+                    {% if items.status_1 %}
+                        <button type="button" class="btn btn-success" disabled>完成</button>
+                    {% else %}
+                        <button type="button" class="btn btn-secondary" onclick="send({{ items.pk }},1)">未啟動</button>
+                    {% endif %}
+                </td>
+                <td>
+                    {% if items.status_2 %}
+                        <button type="button" class="btn btn-success" disabled>完成</button>
+                    {% else %}
+                        {% if items.status_1 %}
+                            <button type="button" class="btn btn-secondary" onclick="send({{ items.pk }},2)">未啟動
+                            </button>
+                        {% else %}
+                            <button type="button" class="btn btn-secondary" disabled>未啟動
+                            </button>
+                        {% endif %}
+                    {% endif %}
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</center>
+
+</body>
+<script>
+    function send(index, type) {
+        console.log(index);
+        console.log(type);
+        Swal.fire({
+            title: "啟用人",
+            text: "請輸入姓名:",
+            input: 'text',
+            showCancelButton: true
+        }).then((result) => {
+            if (result.value) {
+                update();
+                $.ajax({
+                    type: 'POST',
+                    url: '{% url 'Index' %}',
+                    data: {'index': index, 'type': type, 'name': result.value},
+                    success: function (data) {
+                    },
+                    dataType: 'json'
+                });
+            }
+        });
+    }
+
+    var clock = setInterval(update, 5000);
+
+    function update() {
+        $.ajax({
+            url: '{% url 'update' %}',
+            method: "GET",
+            dataType: 'json',
+            success: function (response) {
+                $('#content').html(response.data);
+            }
+        });
+    }
+</script>
+</html>

@@ -51,13 +51,13 @@
             <tr>
                 <th scope="row">{{ items.pk }}</th>
                 <td>
-                    {{ items.name }}
+                    <a href="{% url 'adduser' %}?token={{ items.pk }}">{{ items.name }}</a>
                 </td>
                 <td>
                     {% if items.status_1 %}
                         <button type="button" class="btn btn-success" disabled>完成</button>
                     {% else %}
-                        <button type="button" class="btn btn-secondary" onclick="send({{ items.pk }},1)">未啟動</button>
+                       <button type="button" class="btn btn-secondary" onclick="send({{ items.pk }},1)">未啟動</button>
                     {% endif %}
                 </td>
                 <td>
@@ -81,30 +81,31 @@
 
 </body>
 <script>
-    function send(index, type) {
-        console.log(index);
-        console.log(type);
-        Swal.fire({
-            title: "啟用人",
-            text: "請輸入姓名:",
-            input: 'text',
-            showCancelButton: true
-        }).then((result) => {
-            if (result.value) {
-                update();
-                $.ajax({
-                    type: 'POST',
-                    url: '{% url 'Index' %}',
-                    data: {'index': index, 'type': type, 'name': result.value},
-                    success: function (data) {
-                    },
-                    dataType: 'json'
-                });
-            }
-        });
-    }
+    update();
+    {#function send(index, type) {#}
+    {#    console.log(index);#}
+    {#    console.log(type);#}
+    {#    Swal.fire({#}
+    {#        title: "啟用人",#}
+    {#        text: "請輸入姓名:",#}
+    {#        input: 'text',#}
+    {#        showCancelButton: true#}
+    {#    }).then((result) => {#}
+    {#        if (result.value) {#}
+    {#            update();#}
+    {#            $.ajax({#}
+    {#                type: 'POST',#}
+    {#                url: '{% url 'Index' %}',#}
+    {#                data: {'index': index, 'type': type, 'name': result.value},#}
+    {#                success: function (data) {#}
+    {#                },#}
+    {#                dataType: 'json'#}
+    {#            });#}
+    {#        }#}
+    {#    });#}
+    {#}#}
 
-    //var clock = setInterval(update, 5000);
+    {#var clock = setInterval(update, 1000);#}
 
     function update() {
         $.ajax({
@@ -115,6 +116,7 @@
                 $('#content').html(response.data);
             }
         });
+    }
     }
 </script>
 </html>

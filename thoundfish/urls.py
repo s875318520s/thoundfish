@@ -21,6 +21,7 @@ from main.views import *
 urlpatterns = [
     path(r'', Index.as_view(), name='Index'),
     path(r'all/', All.as_view(), name='all'),
+    path(r'adduser/', ADD_user.as_view(), name='adduser'),
     path(r'update/', API_update_status.as_view(), name='update'),
 
     path('admin/', admin.site.urls),

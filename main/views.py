@@ -1,7 +1,7 @@
 from datetime import datetime
 
 from django.http import JsonResponse
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 
 # Create your views here.
 from django.views import View
@@ -42,14 +42,35 @@ class Index(TemplateView):
             result['status'] = 'fail'
             result['change'] = '錯誤PK'
         return JsonResponse(result)
+
+
 class All(TemplateView):
     template_name = "./all.html"
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['db'] = unit.objects.all()
-
+        # OOP
+        # new_obj = unit()
+        # new_obj.name = 'OOP'
+        # new_obj.status_1 = True
+        # new_obj.save()
+        # ONE LINE
+        # unit.objects.create(name='one_line')
         return context
+
+
+class ADD_user(TemplateView):
+    template_name = "./input_page.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        try:
+            context['db'] = unit.objects.filter(index=self.request.GET['token'])[0]
+        except:
+            pass
+        return context
+
 
 class API_update_status(View):
     def get(self, request):
@@ -72,3 +93,25 @@ class API_update_status(View):
 
             contents += '<tr><th scope="row">' + pk + '</th><td>' + items.name + '</td><td>' + button1 + '</td><td>' + button2 + '</td></tr>'
         return JsonResponse({'data': contents})
+
+    def post(self, request):
+        try:
+            index = int(request.POST['index'])
+            type = int(request.POST['type'])
+            username = request.POST['username']
+
+            if type == 0:
+                query = unit.objects.filter(index=index)[0]
+                query.status_1 = True
+                query.status_1_change = datetime.now()
+                query.status_1_uesr = username
+                query.save()
+            elif type == 1:
+                query = unit.objects.filter(index=index)[0]
+                query.status_2 = True
+                query.status_2_change = datetime.now()
+                query.status_2_uesr = username
+                query.save()
+        except:
+            pass
+        return redirect('/')
